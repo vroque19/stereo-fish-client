@@ -1,6 +1,9 @@
+
 import numpy as np
 import cv2
 import os
+import select
+import sys
 from picamera import PiCamera
 from PIL import Image
 # Raspberry Pi pin configuration:
@@ -11,7 +14,13 @@ bus = 0
 device = 0
 filename = './static/photo.png'
 
-def stream(disp):
+def key_pressed(fd):
+    dr, _, _ = select.select([sys.stdin], [], [], 0)
+    if dr:
+        return sys.stdin.read(1)
+    return None
+
+def stream(disp, fd, old_settings):
     print("live streaming")
     # Camera settings
     cam_width = 1280
@@ -29,6 +38,7 @@ def stream(disp):
     camera = PiCamera(stereo_mode='side-by-side', stereo_decimate=False)
     camera.resolution = (cam_width, cam_height)
     camera.framerate = 10
+    
 
     while True:
         camera.capture(capture, format="bgra", use_video_port=True, resize=(img_width, img_height))
@@ -37,10 +47,13 @@ def stream(disp):
         img = Image.fromarray(frame)
         img = img.resize((320, 240), Image.LANCZOS)
         disp.ShowImage(img)
-
-        key = cv2.waitKey(1) & 0xFF
-        if key == ord("q"):
-            if not os.path.isdir("./static"):
+        key = key_pressed(fd)
+        if key == 'c':
+            if not os.path.exists("./static"):
                 os.makedirs("./static")
+            filename = f"./static/captured_img.jpg"
             cv2.imwrite(filename, frame)
+            print(f"Image saved to {filename}")
             break
+
+        # raw_capture.truncate(0)  # Clear the stream buffer for next frame
