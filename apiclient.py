@@ -28,10 +28,11 @@ def get_secret():
     return os.environ.get("SECRET_KEY")
 
 
+myfish = "captured_img.jpg"
 url = "https://api.vanessa.codes"
-root = "/Users/vanessaroque/code/repos/stereo-fish-client"
+root = "/home/ubuntu/repos/stereo-cam-client"
 image = root + "static/uploaded_images"
-fish = root + "/static/fish/FISH1.jpg"
+fish = f"{root}/static/fish/{myfish}"
 
 
 def send_image(filename="FISH1.jpg"):
@@ -53,7 +54,7 @@ def send_image(filename="FISH1.jpg"):
     print(f"Seconds: {end-start}")
 
 
-# TODO: label image with points and dimensions
+# FISH1
 data1 = {
     "points": [
         [382.2874233722687, 2415.8681497573853],
@@ -62,6 +63,16 @@ data1 = {
         [2447.4448585510254, 2700.5393295288086],
     ],
     "dimensions": [[103.97687464562867, 53.06312127179164]],
+}
+# Henry
+data2 = {
+    "points": [
+        [70, 250.5204129219055],
+        [440.5932940244675, 250.7044534087181],
+        [250.673421382904, 80.4719989299774],
+        [250.4725728034973, 420.7164261341095],
+    ],
+    "dimensions": [[35.972746697759895, 38.79064460737814]],
 }
 
 
@@ -80,7 +91,7 @@ def label_image(image_path, data):
     # top_x, top_y = points[2]
     # bottom_x, bottom_y = points[3]
 
-    # Draw the points
+    # Draw the points on stereo images
     i = 0
     for x, y in [points[0], points[1], points[2], points[3]]:
         cv2.circle(
@@ -91,15 +102,24 @@ def label_image(image_path, data):
             thickness=pose_pnt_thickness,
         )
         i += 1
+    i = 0
+    for x, y in [points[0], points[1], points[2], points[3]]:
+        cv2.circle(
+            image,
+            (int(x) + 710, int(y) + 15),
+            radius=pose_pnt_circle_radius,
+            color=point_colors[i],
+            thickness=pose_pnt_thickness,
+        )
+        i += 1
 
-    # Optional: draw a line for length or annotate dimensions
     length, width = dimensions
     cv2.putText(
         image,
         f"Length: {length:.2f}cm, Width: {width:.2f}cm",
-        (50, 150),
+        (20, 40),
         cv2.FONT_HERSHEY_SIMPLEX,
-        5,
+        1,
         (255, 255, 255),
         2,
         cv2.LINE_4,
@@ -110,4 +130,4 @@ def label_image(image_path, data):
 
 
 # send_image()
-label_image(fish, data1)
+label_image(fish, data2)
