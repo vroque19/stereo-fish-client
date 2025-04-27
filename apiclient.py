@@ -28,10 +28,11 @@ def get_secret():
     return os.environ.get("SECRET_KEY")
 
 
-myfish = "captured_img.jpg"
+myfish = "carp.png"
 url = "https://api.vanessa.codes"
 root = "/home/ubuntu/repos/stereo-cam-client"
 image = root + "static/uploaded_images"
+label_path = root + "/static/labels/"
 fish = f"{root}/static/fish/{myfish}"
 
 
@@ -46,6 +47,7 @@ def send_image(filename="FISH1.jpg"):
         response = requests.post(endpoint, headers=header, files=file)
         points = response.text
         data = json.loads(points)
+        print(data["points"])
         print(data["dimensions"])
         print("Status Code:", response.status_code)
         label_image(fish, data)
@@ -75,6 +77,16 @@ data2 = {
     "dimensions": [[35.972746697759895, 38.79064460737814]],
 }
 
+data_carp = {
+    "points": [
+        [1163.3631620407104, 514.0876874923706],
+        [145.47603225708008, 342.2558765411377],
+        [452.62770879268646, 290.68590331077576],
+        [770.0874239206314, 683.0674968361855],
+    ],
+    "dimensions": [[100.20219810571584, 57.54238652040983]],
+}
+
 
 def label_image(image_path, data):
     # Load the image with OpenCV
@@ -102,16 +114,16 @@ def label_image(image_path, data):
             thickness=pose_pnt_thickness,
         )
         i += 1
-    i = 0
-    for x, y in [points[0], points[1], points[2], points[3]]:
-        cv2.circle(
-            image,
-            (int(x) + 710, int(y) + 15),
-            radius=pose_pnt_circle_radius,
-            color=point_colors[i],
-            thickness=pose_pnt_thickness,
-        )
-        i += 1
+    # i = 0
+    # for x, y in [points[0], points[1], points[2], points[3]]:
+    #     cv2.circle(
+    #         image,
+    #         (int(x) + 710, int(y) + 15),
+    #         radius=pose_pnt_circle_radius,
+    #         color=point_colors[i],
+    #         thickness=pose_pnt_thickness,
+    #     )
+    #     i += 1
 
     length, width = dimensions
     cv2.putText(
@@ -126,8 +138,10 @@ def label_image(image_path, data):
     )
 
     # Convert for display or save
-    cv2.imwrite("output_labeled.jpg", image)
+    # print(label_path)
+    labeled_fish = os.path.join(label_path, f"labeled_{myfish}")
+    cv2.imwrite(labeled_fish, image)
 
 
-# send_image()
-label_image(fish, data2)
+# send_image(myfish)
+label_image(fish, data_carp)
