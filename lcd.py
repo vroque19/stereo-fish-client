@@ -16,7 +16,7 @@ import numpy as np
 from datetime import datetime
 
 photo_path = 'static/'
-
+# filename = photo_path + 'fish.png'
 # Raspberry Pi pin configuration:
 RST = 27
 DC = 25
@@ -45,7 +45,16 @@ def show_welcome(disp):
     draw.text((x, y), text, fill="WHITE", font=font, align="center")
     disp.ShowImage(image)
     time.sleep(3)  # Optional delay before starting stream
-
+    image = Image.new("RGB", (disp.height, disp.width), "BLUE")
+    draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype("./Font/Font00.ttf", 24)
+    text = "1. Place fish in frame\n2. Press button to capture"
+    w, h = draw.textsize(text, font=font)
+    x = (disp.height - w) // 2
+    y = (disp.width - h) // 2
+    draw.text((x, y), text, fill="WHITE", font=font, align="center")
+    disp.ShowImage(image)
+    time.sleep(3)
 def stream_cam():
   # Capture frames from the camera
   while True:

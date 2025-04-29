@@ -35,7 +35,7 @@ def stream(disp, fd, old_settings):
     capture = np.zeros((img_height, img_width, 4), dtype=np.uint8)
 
     # Initialize the camera
-    camera = PiCamera(stereo_mode='side-by-side', stereo_decimate=False)
+    camera = PiCamera(stereo_mode='none', stereo_decimate=False)
     camera.resolution = (cam_width, cam_height)
     camera.framerate = 10
     
@@ -51,7 +51,7 @@ def stream(disp, fd, old_settings):
         if key == 'c':
             if not os.path.exists("./static"):
                 os.makedirs("./static")
-            filename = f"./static/captured_img.jpg"
+            filename = f"./static/fish.png"
             cv2.imwrite(filename, frame)
             print(f"Image saved to {filename}")
             break
